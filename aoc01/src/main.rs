@@ -5,7 +5,7 @@ use std::{
 
 fn main() {
     let values: Vec<i32> = {
-        let file = File::open("input/input.txt").unwrap();
+        let file = File::open("input.txt").unwrap();
         let reader = BufReader::new(file);
         reader
             .lines()
