@@ -1,23 +1,11 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-    vec,
-};
+struct Entry<'a> {
+    range: (usize, usize),
+    character: char,
+    password: &'a str,
+}
 
 fn main() {
-    let lines: Vec<String> = {
-        let file = File::open("aoc02/input.txt").unwrap();
-        let reader = BufReader::new(file);
-        reader.lines().map(|l| l.unwrap()).collect()
-    };
-
-    // let lines = vec![
-    //     "1-3 a: abcde".to_string(),
-    //     "1-3 b: cdefg".to_string(),
-    //     "2-9 c: ccccccccc".to_string(),
-    // ];
-
-    let parsed_data = parse(&lines);
+    let parsed_data = parse(include_str!("../input.txt"));
 
     println!("Part 1:");
     part1(&parsed_data);
@@ -54,37 +42,30 @@ fn part2(entries: &Vec<Entry>) {
     println!("Valid password count: {}", valid);
 }
 
-struct Entry<'a> {
-    range: (usize, usize),
-    character: char,
-    password: &'a str,
-}
+fn parse(input: &str) -> Vec<Entry> {
+    input
+        .lines()
+        .map(|line| {
+            let parts = line.split(' ').collect::<Vec<_>>();
 
-fn parse(lines: &Vec<String>) -> Vec<Entry> {
-    let mut ret = vec![];
+            match parts.as_slice() {
+                [range, character, password] => {
+                    let bounds: Vec<_> = range.split('-').collect();
+                    let min = bounds[0].parse().unwrap();
+                    let max = bounds[1].parse().unwrap();
 
-    for line in lines {
-        let parts = line.split(' ').collect::<Vec<_>>();
+                    let c = character.chars().next().unwrap();
 
-        match parts.as_slice() {
-            [range, character, password] => {
-                let bounds: Vec<_> = range.split('-').collect();
-                let min = bounds[0].parse().unwrap();
-                let max = bounds[1].parse().unwrap();
+                    let password = password;
 
-                let c = character.chars().next().unwrap();
-
-                let password = password;
-
-                ret.push(Entry {
-                    range: (min, max),
-                    character: c,
-                    password,
-                })
+                    Entry {
+                        range: (min, max),
+                        character: c,
+                        password,
+                    }
+                }
+                _ => unreachable!(),
             }
-            _ => unreachable!(),
-        }
-    }
-
-    ret
+        })
+        .collect()
 }
