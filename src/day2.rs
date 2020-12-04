@@ -8,7 +8,7 @@ pub struct Entry {
 }
 
 #[aoc_generator(day2)]
-pub fn input_generator(input: &str) -> Vec<Entry> {
+pub fn generator(input: &str) -> Vec<Entry> {
     input
         .lines()
         .map(|line| {
@@ -37,7 +37,7 @@ pub fn input_generator(input: &str) -> Vec<Entry> {
 }
 
 #[aoc(day2, part1)]
-pub fn solve_part1(input: &[Entry]) -> u32 {
+pub fn part1(input: &[Entry]) -> u32 {
     let mut valid = 0;
 
     for entry in input {
@@ -52,7 +52,7 @@ pub fn solve_part1(input: &[Entry]) -> u32 {
 }
 
 #[aoc(day2, part2)]
-pub fn solve_part2(input: &[Entry]) -> u32 {
+pub fn part2(input: &[Entry]) -> u32 {
     let mut valid = 0;
 
     for entry in input {
@@ -64,4 +64,25 @@ pub fn solve_part2(input: &[Entry]) -> u32 {
     }
 
     valid
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SAMPLE: &str = indoc::indoc! {"
+		1-3 a: abcde
+		1-3 b: cdefg
+		2-9 c: ccccccccc
+	"};
+
+    #[test]
+    pub fn test1() {
+        assert_eq!(part1(&generator(SAMPLE)), 2);
+    }
+
+    #[test]
+    pub fn test2() {
+        assert_eq!(part2(&generator(SAMPLE)), 1);
+    }
 }
