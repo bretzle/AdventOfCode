@@ -22,7 +22,7 @@ pub fn part1(input: &str) -> usize {
 pub fn part2(input: &str) -> usize {
     let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
 
-    slopes.iter().map(|slope| solve(input, *slope)).product()
+    slopes.iter().map(|&slope| solve(input, slope)).product()
 }
 
 #[cfg(test)]
