@@ -9,3 +9,4 @@ Solutions for the Advent of Code
 | 2   | 67.740 us | 27.436 us |
 | 3   | 133.49 us | 723.74 us |
 | 4   | 2.9113 ns | 3.7930 us |
+| 5   | 45.287 us | 52.754 us |
