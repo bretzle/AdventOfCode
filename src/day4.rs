@@ -14,7 +14,7 @@ pub struct Passport {
 }
 
 #[aoc_generator(day4)]
-pub fn generator(input: &str) -> Vec<Passport> {
+pub fn generator(input: &str) -> Vec<Option<Passport>> {
     input
         .split("\n\n")
         .map(|record| {
@@ -26,7 +26,7 @@ pub fn generator(input: &str) -> Vec<Passport> {
                 })
                 .collect::<HashMap<_, _>>()
         })
-        .filter_map(|map| {
+        .map(|map| {
             let hgt = map.get("hgt")?;
             let unit_pos = hgt
                 .chars()
@@ -48,16 +48,18 @@ pub fn generator(input: &str) -> Vec<Passport> {
 }
 
 #[aoc(day4, part1)]
-pub fn part1(inputs: &[Passport]) -> usize {
-    inputs.len()
+pub fn part1(inputs: &[Option<Passport>]) -> usize {
+    inputs.iter().filter_map(|option| option.as_ref()).count()
+    // inputs.len()
 }
 
 #[aoc(day4, part2)]
-pub fn part2(inputs: &[Passport]) -> usize {
+pub fn part2(inputs: &[Option<Passport>]) -> usize {
     const VALID_ECL: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
     inputs
         .iter()
+        .filter_map(|option| option.as_ref())
         .filter(|passport| {
             let mut hcl_iter = passport.hcl.chars();
             passport.byr >= 1920
