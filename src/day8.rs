@@ -5,40 +5,28 @@ use std::collections::HashSet;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Opcode {
-    ACC,
-    JMP,
-    NOP,
+    ACC(isize),
+    JMP(isize),
+    NOP(isize),
 }
 
-type Data = Vec<(Opcode, isize)>;
-
 #[aoc_generator(day8)]
-pub fn generator(input: &str) -> Data {
+pub fn generator(input: &str) -> Vec<Opcode> {
     input
         .lines()
         .map(|line| {
             let mut parts = line.split(' ');
-            let opcode = match parts.next().unwrap() {
-                "acc" => Opcode::ACC,
-                "jmp" => Opcode::JMP,
-                "nop" => Opcode::NOP,
+            match parts.next().unwrap() {
+                "acc" => Opcode::ACC(parts.next().unwrap().parse().unwrap()),
+                "jmp" => Opcode::JMP(parts.next().unwrap().parse().unwrap()),
+                "nop" => Opcode::NOP(parts.next().unwrap().parse().unwrap()),
                 _ => unreachable!(),
-            };
-
-            let arg = match opcode {
-                Opcode::ACC | Opcode::JMP => {
-                    let arg = parts.next().unwrap();
-                    arg.parse().unwrap()
-                }
-                Opcode::NOP => 0,
-            };
-
-            (opcode, arg)
+            }
         })
         .collect()
 }
 
-fn execute_program(program: &Data) -> Result<isize, isize> {
+fn execute_program(program: &[Opcode]) -> Result<isize, isize> {
     let mut accumulator = 0;
     let mut idx = 0;
     let mut visited = HashSet::new();
@@ -49,13 +37,13 @@ fn execute_program(program: &Data) -> Result<isize, isize> {
             None => return Ok(accumulator),
         };
 
-        match instruction.0 {
-            Opcode::ACC => {
-                accumulator += instruction.1;
+        match instruction {
+            Opcode::ACC(val) => {
+                accumulator += val;
                 idx += 1
             }
-            Opcode::JMP => idx += instruction.1,
-            Opcode::NOP => idx += 1,
+            Opcode::JMP(val) => idx += val,
+            Opcode::NOP(_) => idx += 1,
         }
 
         if !visited.insert(idx) {
@@ -65,7 +53,7 @@ fn execute_program(program: &Data) -> Result<isize, isize> {
 }
 
 #[aoc(day8, part1)]
-pub fn part1(data: &Data) -> isize {
+pub fn part1(data: &Vec<Opcode>) -> isize {
     match execute_program(&data) {
         Ok(val) => val,
         Err(val) => val,
@@ -73,18 +61,19 @@ pub fn part1(data: &Data) -> isize {
 }
 
 #[aoc(day8, part2)]
-pub fn part2(data: &Data) -> isize {
+pub fn part2(data: &Vec<Opcode>) -> isize {
     data.iter()
         .enumerate()
-        .filter_map(|(idx, &instruction)| match instruction.0 {
-            Opcode::ACC => None,
+        .rev()
+        .filter_map(|(idx, &instruction)| match instruction {
+            Opcode::ACC(_) => None,
             _ => Some(idx),
         })
         .map(|idx| {
             let mut program = data.clone();
             let replacement = match data[idx] {
-                (Opcode::JMP, value) => (Opcode::NOP, value),
-                (Opcode::NOP, value) => (Opcode::JMP, value),
+                Opcode::JMP(value) => Opcode::NOP(value),
+                Opcode::NOP(value) => Opcode::JMP(value),
                 _ => unreachable!(),
             };
             program[idx] = replacement;
